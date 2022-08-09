@@ -17,6 +17,12 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 /**  server에 httmp, ws 둘 다 동작  **/
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server })
+const wss = new WebSocket.Server({ server });
+
+function handleConnection(socket) { // 여기서 socket은 연결된 브라우저 의미
+  console.log(socket)
+}
+
+wss.on("connection", handleConnection)
 
 server.listen(3000, handleListen)
