@@ -61,6 +61,8 @@ const wsServer = SocketIO(httpServer);
 // Front-end에도 socket.io 설치 필요
 
 wsServer.on("connection", socket => {
+  // wsServer.socketsJoin("announcememt")  // ex) socket이 연결되었을 때, 모든 socket이 announcement에 입장하도록 함
+
   socket['nickname'] = 'Anon';
 
   socket.onAny((event) => {
