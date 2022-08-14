@@ -61,10 +61,16 @@ const wsServer = SocketIO(httpServer);
 // Front-end에도 socket.io 설치 필요
 
 wsServer.on("connection", socket => {
-  socket.on("enter_room", (msg, done) => {
-    console.log(msg);
+  socket.onAny((event) => {
+    console.log(`Socket Event: ${event}`);
+  })
+  socket.on("enter_room", (roomName, done) => {
+    // console.log(socket.id)
+    // console.log(socket.rooms) // 기본적으로 user와 서버 사이에 private room이 있고 그 room은 user id와 동일하다.
+    socket.join(roomName);  // room에 들어가기
+    // console.log(socket.rooms)
     setTimeout(() => {
-      done();
+      done("hello from backend");
     }, 10000)
   });
 })
