@@ -71,6 +71,7 @@ wsServer.on("connection", socket => {
     socket.join(roomName);  // room에 들어가기
     // console.log(socket.rooms)
     done();
+    socket.to(roomName).emit("welcome");  // socket.io는 나를 제외한 모든 사람들에게 message를 보냄
   });
 })
 
