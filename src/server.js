@@ -60,12 +60,30 @@ const wsServer = SocketIO(httpServer);
 // socket.io는 webSocket의 부가기능이 아님. websocket을 지원하지않으면 socket.io는 다른 방법으로 재연결을 시도할 것
 // Front-end에도 socket.io 설치 필요
 
+function publicRooms() {
+  // const sids = wsServer.sockets.adapter.sids;
+  // const rooms = wsServer.sockets.adapter.rooms;
+  // or
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = wsServer;
+
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) publicRooms.push(key);
+  });
+  return publicRooms;
+}
+
 wsServer.on("connection", socket => {
   // wsServer.socketsJoin("announcememt")  // ex) socket이 연결되었을 때, 모든 socket이 announcement에 입장하도록 함
 
   socket['nickname'] = 'Anon';
 
   socket.onAny((event) => {
+    console.log(wsServer.sockets.adapter)
     console.log(`Socket Event: ${event}`);
   })
 
@@ -76,11 +94,18 @@ wsServer.on("connection", socket => {
     // console.log(socket.rooms)
     done();
     socket.to(roomName).emit("welcome", socket.nickname);  // socket.io는 나를 제외한 모든 사람들에게 message를 보냄
+    wsServer.sockets.emit("room_change", publicRooms());  // 모든 socket에 메세지를 보냄
   });
 
   socket.on("disconnecting", () => {
-    socket.rooms.forEach(room => socket.to(room).emit("bye", socket.nickname));
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
   });
+
+  socket.on("disconnect", () => { // disconnecting 안에 작성하면 room은 존재하기때문에 동작하지 않음
+    wsServer.sockets.emit("room_change", publicRooms());
+  })
 
   socket.on("new_message", (msg, room, done) => {
     socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
