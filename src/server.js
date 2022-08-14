@@ -61,6 +61,8 @@ const wsServer = SocketIO(httpServer);
 // Front-end에도 socket.io 설치 필요
 
 wsServer.on("connection", socket => {
+  socket['nickname'] = 'Anon';
+
   socket.onAny((event) => {
     console.log(`Socket Event: ${event}`);
   })
@@ -71,17 +73,19 @@ wsServer.on("connection", socket => {
     socket.join(roomName);  // room에 들어가기
     // console.log(socket.rooms)
     done();
-    socket.to(roomName).emit("welcome");  // socket.io는 나를 제외한 모든 사람들에게 message를 보냄
+    socket.to(roomName).emit("welcome", socket.nickname);  // socket.io는 나를 제외한 모든 사람들에게 message를 보냄
   });
 
   socket.on("disconnecting", () => {
-    socket.rooms.forEach(room => socket.to(room).emit("bye"));
+    socket.rooms.forEach(room => socket.to(room).emit("bye", socket.nickname));
   });
 
   socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", msg);
+    socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
     done();
-  })
+  });
+
+  socket.on("nickname", (nickname) => socket['nickname'] = nickname);
 })
 
 httpServer.listen(3000, handleListen); 
