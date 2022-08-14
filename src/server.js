@@ -64,14 +64,13 @@ wsServer.on("connection", socket => {
   socket.onAny((event) => {
     console.log(`Socket Event: ${event}`);
   })
+
   socket.on("enter_room", (roomName, done) => {
     // console.log(socket.id)
     // console.log(socket.rooms) // 기본적으로 user와 서버 사이에 private room이 있고 그 room은 user id와 동일하다.
     socket.join(roomName);  // room에 들어가기
     // console.log(socket.rooms)
-    setTimeout(() => {
-      done("hello from backend");
-    }, 10000)
+    done();
   });
 })
 
