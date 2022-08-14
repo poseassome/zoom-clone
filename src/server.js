@@ -73,6 +73,15 @@ wsServer.on("connection", socket => {
     done();
     socket.to(roomName).emit("welcome");  // socket.io는 나를 제외한 모든 사람들에게 message를 보냄
   });
+
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach(room => socket.to(room).emit("bye"));
+  });
+
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", msg);
+    done();
+  })
 })
 
 httpServer.listen(3000, handleListen); 
