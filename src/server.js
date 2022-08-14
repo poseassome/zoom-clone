@@ -1,6 +1,8 @@
 import http from "http";
 // import WebSocket from "ws";
-import SocketIO from "socket.io";
+// import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express";
 
 const app = express();
@@ -54,7 +56,16 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 
 const httpServer = http.createServer(app);
-const wsServer = SocketIO(httpServer);
+// const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  }
+});
+instrument(wsServer, {
+  auth: false,
+});
 
 // http://localhost:3000/socket.io/socket.io.js
 // socket.io는 webSocket의 부가기능이 아님. websocket을 지원하지않으면 socket.io는 다른 방법으로 재연결을 시도할 것
