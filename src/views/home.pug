@@ -9,6 +9,7 @@ html(lang="en")
   body 
     header
       h1 Zoom Clone
+    //- chat
     main
       div#welcome
         form
@@ -25,5 +26,13 @@ html(lang="en")
         form#msg
           input(placeholder="message", required, type='text')
           button send
+
+      //- video
+      main 
+        div#myStream
+          video#myFace(autoplay,playsinline, width="400", height="400")
+          button#mute Mute
+          button#camera Turn Camera Off
+          select#cameras
     script(src='/socket.io/socket.io.js')
     script(src='/public/js/app.js')
